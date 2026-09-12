@@ -44,8 +44,6 @@
     padding:0 24px;
   }
 
-  /* ---------- Notched "voxel panel" — recurring visual device instead of
-     rounded SaaS cards. Pixel-style clipped corners echo block edges. ---------- */
   .panel{
     background:var(--bg-panel);
     border:1px solid var(--border-line);
@@ -53,7 +51,6 @@
     padding:28px;
   }
 
-  /* ---------- Nav ---------- */
   header{
     position:sticky; top:0; z-index:50;
     background:rgba(11,18,32,0.92);
@@ -94,7 +91,6 @@
 
   @media (max-width:720px){ .nav-links{ display:none; } }
 
-  /* ---------- Hero ---------- */
   .hero{
     padding:88px 24px 72px;
     max-width:1080px; margin:0 auto;
@@ -150,14 +146,12 @@
   }
   .voxel .pixel{ position:absolute; width:14px; height:14px; background:var(--dirt-dark); opacity:0.6; }
 
-  /* ---------- Sections shared ---------- */
   section{ padding:64px 24px; }
   .section-head{ max-width:640px; margin-bottom:44px; }
   .section-head .eyebrow{ margin-bottom:10px; }
   h2{ font-size:clamp(1.5rem, 2.6vw, 1.9rem); font-weight:800; margin-bottom:12px; }
   .section-head p{ color:var(--text-muted); }
 
-  /* ---------- Features ---------- */
   .feature-grid{
     max-width:1080px; margin:0 auto;
     display:grid; grid-template-columns:repeat(2, 1fr); gap:16px;
@@ -172,7 +166,6 @@
   .feature h3{ font-size:1.12rem; margin-bottom:8px; font-weight:700; }
   .feature p{ color:var(--text-muted); font-size:0.94rem; }
 
-  /* ---------- Preview mockup ---------- */
   .preview-wrap{ max-width:1080px; margin:0 auto; }
   .mock{
     background:var(--bg-panel-alt); border:1px solid var(--border-line);
@@ -205,7 +198,6 @@
     clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));
   }
 
-  /* ---------- Download ---------- */
   .download-panel{
     max-width:1080px; margin:0 auto;
     display:grid; grid-template-columns:1fr auto; gap:32px; align-items:center;
@@ -220,7 +212,6 @@
   .meta-row span{ display:flex; align-items:center; gap:7px; }
   .meta-dot{ width:6px; height:6px; background:var(--accent-sky); flex-shrink:0; }
 
-  /* ---------- Steps ---------- */
   .steps{ max-width:1080px; margin:0 auto; }
   .step-list{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
   @media (max-width:720px){ .step-list{ grid-template-columns:1fr; } }
@@ -232,14 +223,12 @@
   .step h3{ font-size:1.02rem; margin-bottom:8px; font-weight:700; }
   .step p{ color:var(--text-muted); font-size:0.92rem; }
 
-  /* ---------- FAQ ---------- */
   .faq{ max-width:720px; margin:0 auto; }
   .faq-item{ border-bottom:1px solid var(--border-line); padding:20px 0; }
   .faq-item:first-child{ border-top:1px solid var(--border-line); }
   .faq-item h3{ font-size:1rem; font-weight:700; margin-bottom:8px; }
   .faq-item p{ color:var(--text-muted); font-size:0.94rem; }
 
-  /* ---------- Footer ---------- */
   footer{
     border-top:1px solid var(--border-line);
     padding:32px 24px 40px;
@@ -280,7 +269,7 @@
     <h1>Один лаунчер вместо трёх вкладок и папки модов</h1>
     <p>Uran Launcher ставит нужную версию Minecraft, подключает Fabric или Forge и сразу накатывает Sodium с Iris — без ручного поиска джарников по форумам.</p>
     <div class="cta-row">
-      <a href="download/UranLauncherSetup.zip" class="btn-primary">
+      <a href="https://github.com/q47926215-sudo/Uran-Launcher-Dowland/releases/download/v1.0.0/UranLauncherSetup.zip" class="btn-primary">
         Скачать Uran Launcher
         <small>Windows · v1.0 · .zip</small>
       </a>
@@ -373,7 +362,7 @@
         <span><span class="meta-dot"></span>Java устанавливается автоматически</span>
       </div>
     </div>
-    <a href="download/UranLauncherSetup.zip" class="btn-primary">
+    <a href="https://github.com/q47926215-sudo/Uran-Launcher-Dowland/releases/download/v1.0.0/UranLauncherSetup.zip" class="btn-primary">
       Скачать .zip
       <small>UranLauncherSetup.zip</small>
     </a>
