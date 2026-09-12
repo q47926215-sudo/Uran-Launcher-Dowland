@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uran Launcher — лаунчер для Minecraft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void: #0b1220;
+    --bg-panel: #131c30;
+    --bg-panel-alt: #0f1729;
+    --border-line: #24314f;
+    --accent-sky: #38bdf8;
+    --accent-blue: #3b82f6;
+    --accent-blue-hover: #2563eb;
+    --grass: #4ade80;
+    --grass-dark: #22c55e;
+    --dirt: #78350f;
+    --dirt-dark: #451a03;
+    --text-main: #e6ebf5;
+    --text-muted: #8b96ad;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg-void);
+    color:var(--text-main);
+    font-family:'Inter', system-ui, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- Notched "voxel panel" — recurring visual device instead of
+     rounded SaaS cards. Pixel-style clipped corners echo block edges. ---------- */
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border-line);
+    clip-path:polygon(0 10px,10px 10px,10px 0,calc(100% - 10px) 0,calc(100% - 10px) 10px,100% 10px,100% calc(100% - 10px),calc(100% - 10px) calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,10px calc(100% - 10px),0 calc(100% - 10px));
+    padding:28px;
+  }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(11,18,32,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border-line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+    max-width:1080px; margin:0 auto;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-weight:800; font-size:1.05rem; letter-spacing:0.02em;
+    text-decoration:none;
+  }
+  .logo-mark{
+    width:22px; height:22px; position:relative; flex-shrink:0;
+  }
+  .logo-mark::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:9px;
+    background:var(--grass); border:1px solid var(--grass-dark);
+  }
+  .logo-mark::after{
+    content:''; position:absolute; bottom:0; left:0; right:0; top:9px;
+    background:var(--dirt); border:1px solid var(--dirt-dark); border-top:none;
+  }
+  .nav-links{ display:flex; gap:28px; font-size:0.92rem; color:var(--text-muted); }
+  .nav-links a{ text-decoration:none; transition:color .15s; }
+  .nav-links a:hover{ color:var(--text-main); }
+  .nav-dl{
+    padding:9px 18px; font-size:0.88rem; font-weight:600;
+    background:var(--accent-blue); color:#fff; text-decoration:none;
+    clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));
+    transition:background .15s;
+  }
+  .nav-dl:hover{ background:var(--accent-blue-hover); }
+
+  @media (max-width:720px){ .nav-links{ display:none; } }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:88px 24px 72px;
+    max-width:1080px; margin:0 auto;
+    display:grid; grid-template-columns:1.15fr 0.85fr; gap:56px; align-items:center;
+  }
+  .eyebrow{
+    font-size:0.82rem; color:var(--accent-sky); font-weight:600; margin-bottom:16px;
+  }
+  h1{
+    font-size:clamp(2.1rem, 4.2vw, 3.1rem);
+    line-height:1.14; font-weight:800; letter-spacing:-0.01em;
+    margin-bottom:20px;
+  }
+  .hero p{
+    color:var(--text-muted); font-size:1.05rem; max-width:46ch; margin-bottom:32px;
+  }
+  .cta-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:15px 26px; font-size:0.98rem; font-weight:700;
+    background:var(--accent-blue); color:#fff; text-decoration:none;
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+    transition:background .15s, transform .1s;
+  }
+  .btn-primary:hover{ background:var(--accent-blue-hover); }
+  .btn-primary:active{ transform:translateY(1px); }
+  .btn-primary small{ display:block; font-weight:500; font-size:0.74rem; opacity:0.85; }
+  .btn-ghost{
+    padding:14px 20px; font-size:0.95rem; font-weight:600;
+    color:var(--text-muted); text-decoration:none; border:1px solid var(--border-line);
+    transition:color .15s, border-color .15s;
+  }
+  .btn-ghost:hover{ color:var(--text-main); border-color:var(--accent-sky); }
+
+  .hero-art{
+    position:relative; height:260px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .voxel{
+    width:150px; height:150px; position:relative;
+  }
+  .voxel .grass{
+    position:absolute; top:0; left:0; right:0; height:80px;
+    background:var(--grass); border:2px solid var(--grass-dark);
+  }
+  .voxel .grass::after{
+    content:''; position:absolute; left:0; right:0; bottom:-6px; height:6px;
+    background:repeating-linear-gradient(90deg, var(--grass-dark) 0 12px, transparent 12px 24px);
+  }
+  .voxel .dirt{
+    position:absolute; top:80px; left:0; right:0; bottom:0;
+    background:var(--dirt); border:2px solid var(--dirt-dark); border-top:none;
+  }
+  .voxel .pixel{ position:absolute; width:14px; height:14px; background:var(--dirt-dark); opacity:0.6; }
+
+  /* ---------- Sections shared ---------- */
+  section{ padding:64px 24px; }
+  .section-head{ max-width:640px; margin-bottom:44px; }
+  .section-head .eyebrow{ margin-bottom:10px; }
+  h2{ font-size:clamp(1.5rem, 2.6vw, 1.9rem); font-weight:800; margin-bottom:12px; }
+  .section-head p{ color:var(--text-muted); }
+
+  /* ---------- Features ---------- */
+  .feature-grid{
+    max-width:1080px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:16px;
+  }
+  @media (max-width:720px){ .feature-grid{ grid-template-columns:1fr; } }
+  .feature{ }
+  .feature .tag{
+    display:inline-block; font-size:0.72rem; font-weight:700; letter-spacing:0.03em;
+    color:var(--accent-sky); background:rgba(56,189,248,0.1);
+    padding:4px 10px; margin-bottom:14px;
+  }
+  .feature h3{ font-size:1.12rem; margin-bottom:8px; font-weight:700; }
+  .feature p{ color:var(--text-muted); font-size:0.94rem; }
+
+  /* ---------- Preview mockup ---------- */
+  .preview-wrap{ max-width:1080px; margin:0 auto; }
+  .mock{
+    background:var(--bg-panel-alt); border:1px solid var(--border-line);
+    overflow:hidden;
+  }
+  .mock-top{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 16px; border-bottom:1px solid var(--border-line);
+    background:var(--bg-panel);
+  }
+  .mock-dot{ width:9px; height:9px; border-radius:50%; background:var(--border-line); }
+  .mock-body{ display:grid; grid-template-columns:170px 1fr; min-height:280px; }
+  .mock-side{ border-right:1px solid var(--border-line); padding:20px 14px; }
+  .mock-side .mock-avatar{
+    width:44px; height:44px; background:var(--accent-blue); margin-bottom:10px;
+  }
+  .mock-line{ height:9px; background:var(--border-line); margin-bottom:10px; }
+  .mock-line.w60{ width:60%; }
+  .mock-line.w80{ width:80%; }
+  .mock-line.w40{ width:40%; }
+  .mock-main{ padding:28px; display:flex; flex-direction:column; justify-content:space-between; }
+  .mock-version{
+    display:inline-block; padding:8px 14px; background:var(--bg-panel);
+    border:1px solid var(--border-line); font-size:0.82rem; color:var(--text-muted);
+    margin-bottom:10px; width:fit-content;
+  }
+  .mock-play{
+    align-self:flex-start; padding:12px 28px; background:var(--accent-blue);
+    color:#fff; font-weight:700; font-size:0.9rem;
+    clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));
+  }
+
+  /* ---------- Download ---------- */
+  .download-panel{
+    max-width:1080px; margin:0 auto;
+    display:grid; grid-template-columns:1fr auto; gap:32px; align-items:center;
+  }
+  @media (max-width:720px){ .download-panel{ grid-template-columns:1fr; text-align:left; } }
+  .download-panel h2{ margin-bottom:10px; }
+  .download-panel p{ color:var(--text-muted); margin-bottom:0; }
+  .meta-row{
+    display:flex; gap:22px; margin-top:18px; flex-wrap:wrap;
+    font-size:0.86rem; color:var(--text-muted);
+  }
+  .meta-row span{ display:flex; align-items:center; gap:7px; }
+  .meta-dot{ width:6px; height:6px; background:var(--accent-sky); flex-shrink:0; }
+
+  /* ---------- Steps ---------- */
+  .steps{ max-width:1080px; margin:0 auto; }
+  .step-list{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  @media (max-width:720px){ .step-list{ grid-template-columns:1fr; } }
+  .step{ position:relative; padding-top:8px; }
+  .step-num{
+    font-family:'Press Start 2P', monospace; font-size:0.75rem;
+    color:var(--accent-sky); margin-bottom:14px; display:block;
+  }
+  .step h3{ font-size:1.02rem; margin-bottom:8px; font-weight:700; }
+  .step p{ color:var(--text-muted); font-size:0.92rem; }
+
+  /* ---------- FAQ ---------- */
+  .faq{ max-width:720px; margin:0 auto; }
+  .faq-item{ border-bottom:1px solid var(--border-line); padding:20px 0; }
+  .faq-item:first-child{ border-top:1px solid var(--border-line); }
+  .faq-item h3{ font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .faq-item p{ color:var(--text-muted); font-size:0.94rem; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--border-line);
+    padding:32px 24px 40px;
+  }
+  .footer-wrap{
+    max-width:1080px; margin:0 auto;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    flex-wrap:wrap; gap:20px;
+  }
+  .footer-note{ font-size:0.82rem; color:var(--text-muted); max-width:52ch; }
+  .footer-links{ display:flex; gap:20px; font-size:0.86rem; }
+  .footer-links a{ text-decoration:none; color:var(--text-muted); }
+  .footer-links a:hover{ color:var(--text-main); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="#top" class="logo">
+      <span class="logo-mark"></span>
+      URAN LAUNCHER
+    </a>
+    <div class="nav-links">
+      <a href="#features">Особенности</a>
+      <a href="#preview">Интерфейс</a>
+      <a href="#faq">Вопросы</a>
+    </div>
+    <a href="#download" class="nav-dl">Скачать</a>
+  </nav>
+</header>
+
+<div id="top"></div>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">Vanilla · Fabric · Forge — в одном клиенте</div>
+    <h1>Один лаунчер вместо трёх вкладок и папки модов</h1>
+    <p>Uran Launcher ставит нужную версию Minecraft, подключает Fabric или Forge и сразу накатывает Sodium с Iris — без ручного поиска джарников по форумам.</p>
+    <div class="cta-row">
+      <a href="download/UranLauncherSetup.zip" class="btn-primary">
+        Скачать Uran Launcher
+        <small>Windows · v1.0 · .zip</small>
+      </a>
+      <a href="#faq" class="btn-ghost">Как установить</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <div class="voxel">
+      <div class="grass"></div>
+      <div class="dirt"></div>
+      <div class="pixel" style="top:92px; left:20px;"></div>
+      <div class="pixel" style="top:110px; left:90px;"></div>
+      <div class="pixel" style="top:120px; left:50px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="section-head">
+    <div class="eyebrow">Особенности</div>
+    <h2>Всё, что обычно приходится собирать вручную</h2>
+    <p>Четыре вещи, ради которых люди уходят с других лаунчеров.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="panel feature">
+      <span class="tag">Загрузчики</span>
+      <h3>Fabric и Forge без путаницы версий</h3>
+      <p>Выбираешь версию Minecraft и нужный загрузчик — лаунчер сам подтягивает совместимую сборку и ставит поверх ванильного клиента.</p>
+    </div>
+    <div class="panel feature">
+      <span class="tag">Производительность</span>
+      <h3>Sodium и Iris одной галочкой</h3>
+      <p>Оптимизаторы графики и шейдеры ставятся вместе с игрой, а флаги JVM (Aikar's flags) уже настроены под G1GC, чтобы не было фризов на паузах сборщика мусора.</p>
+    </div>
+    <div class="panel feature">
+      <span class="tag">Профили</span>
+      <h3>Свои скины и плащи без сторонних сайтов</h3>
+      <p>Локальное хранилище скинов и плащей — по одному файлу на ник, синхронизируется в игру автоматически при запуске.</p>
+    </div>
+    <div class="panel feature">
+      <span class="tag">Стабильность</span>
+      <h3>Понятный экран краша, а не догадки</h3>
+      <p>Если игра упала — лаунчер сам находит свежий crash-report или хвост лога и показывает его, с кнопкой скопировать в буфер.</p>
+    </div>
+  </div>
+</section>
+
+<section id="preview">
+  <div class="section-head">
+    <div class="eyebrow">Интерфейс</div>
+    <h2>Тёмный интерфейс, без рекламных баннеров</h2>
+    <p>Всё нужное — на одном экране: аккаунты, версия, ОЗУ и кнопка «Войти в игру».</p>
+  </div>
+  <div class="preview-wrap">
+    <div class="mock">
+      <div class="mock-top">
+        <div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-side">
+          <div class="mock-avatar"></div>
+          <div class="mock-line w60"></div>
+          <div class="mock-line w40"></div>
+          <div style="height:24px"></div>
+          <div class="mock-line w80"></div>
+          <div class="mock-line w60"></div>
+          <div class="mock-line w40"></div>
+        </div>
+        <div class="mock-main">
+          <div>
+            <div class="mock-version">📦 Fabric 1.20.1</div>
+            <div class="mock-line w80" style="margin-top:20px;"></div>
+            <div class="mock-line w40"></div>
+          </div>
+          <div class="mock-play">▶ Войти в игру</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="panel download-panel">
+    <div>
+      <h2>Скачать Uran Launcher</h2>
+      <p>Архив содержит установщик — распаковка не нужна вручную, мастер сам разложит файлы.</p>
+      <div class="meta-row">
+        <span><span class="meta-dot"></span>Windows 10/11 · 64-bit</span>
+        <span><span class="meta-dot"></span>~50 МБ</span>
+        <span><span class="meta-dot"></span>Java устанавливается автоматически</span>
+      </div>
+    </div>
+    <a href="download/UranLauncherSetup.zip" class="btn-primary">
+      Скачать .zip
+      <small>UranLauncherSetup.zip</small>
+    </a>
+  </div>
+</section>
+
+<section class="steps" id="how-to">
+  <div class="section-head">
+    <div class="eyebrow">Установка</div>
+    <h2>Три шага от скачивания до первого запуска</h2>
+  </div>
+  <div class="step-list">
+    <div class="step">
+      <span class="step-num">01</span>
+      <h3>Распакуй архив</h3>
+      <p>Внутри .zip лежит UranLauncherSetup.exe — вынь его из архива в любую папку.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <h3>Запусти установщик</h3>
+      <p>Выбери папку установки и отметь, нужны ли ярлыки на Рабочем столе и в меню «Пуск».</p>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <h3>Играй</h3>
+      <p>После завершения установки лаунчер можно сразу открыть — он предложит это в последнем окне мастера.</p>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="section-head">
+    <div class="eyebrow">Вопросы</div>
+    <h2>Частые вопросы</h2>
+  </div>
+  <div class="faq">
+    <div class="faq-item">
+      <h3>Это безопасно?</h3>
+      <p>Установщик не запрашивает лишних прав и не устанавливает ничего, кроме самого лаунчера. Если антивирус или SmartScreen предупреждают о неизвестном разработчике — это нормально для несертифицированных .exe, файл всё равно можно запустить через «Подробнее → Выполнить в любом случае».</p>
+    </div>
+    <div class="faq-item">
+      <h3>Нужно ли ставить Java отдельно?</h3>
+      <p>Нет, лаунчер сам скачивает нужную версию Java Runtime при первой установке версии Minecraft.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Работает ли с лицензионным аккаунтом Microsoft?</h3>
+      <p>Текущая версия рассчитана на офлайн-профили (ник без пароля). Поддержка входа через Microsoft — в планах на следующую версию.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Можно ли перенести моды из другого лаунчера?</h3>
+      <p>Да — скопируй папку mods в директорию профиля Uran Launcher, лаунчер подхватит содержимое при следующем запуске.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-wrap">
+    <div class="footer-note">
+      Uran Launcher — independent-проект, не связан с Mojang Studios, Microsoft или Minecraft напрямую. Minecraft — товарный знак Mojang Studios.
+    </div>
+    <div class="footer-links">
+      <a href="#download">Скачать</a>
+      <a href="#faq">Вопросы</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
