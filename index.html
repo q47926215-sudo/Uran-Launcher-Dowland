@@ -397,6 +397,35 @@
   .footer-links a{ text-decoration:none; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px; }
   .footer-links a:hover{ color:var(--text-main); }
   .footer-links svg{ width:15px; height:15px; }
+
+  /* ---------- Support form ---------- */
+  .support-wrap{ max-width:520px; margin:0 auto; }
+  .support-field{ margin-bottom:14px; }
+  .support-field label{ display:block; font-size:0.86rem; color:var(--text-muted); margin-bottom:6px; }
+  .support-field input, .support-field textarea{
+    width:100%; padding:10px 12px; background:var(--bg-panel-alt); border:1px solid var(--border-line);
+    color:var(--text-main); font-family:inherit; font-size:0.92rem; resize:vertical;
+  }
+  .support-success{
+    display:none; padding:14px 16px; background:rgba(74,222,128,0.1); border:1px solid #22c55e;
+    color:#4ade80; font-size:0.9rem; margin-bottom:16px;
+  }
+
+  /* ---------- Online counter badge ---------- */
+  .online-badge{
+    position:fixed; bottom:20px; left:20px; z-index:100;
+    display:flex; align-items:center; gap:9px;
+    padding:11px 16px; background:var(--bg-panel); border:1px solid var(--border-line);
+    font-size:0.84rem; color:var(--text-main);
+    box-shadow:0 14px 30px -10px rgba(0,0,0,0.6);
+  }
+  .online-dot{
+    width:8px; height:8px; border-radius:50%; background:#22c55e; flex-shrink:0;
+    box-shadow:0 0 0 3px rgba(34,197,94,0.22);
+    animation:pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{ 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
+  @media (max-width:600px){ .online-badge{ left:12px; bottom:12px; padding:9px 13px; font-size:0.78rem; } }
 </style>
 </head>
 <body>
@@ -411,6 +440,7 @@
       <a href="#features">Особенности</a>
       <a href="#preview">Интерфейс</a>
       <a href="#reviews">Отзывы</a>
+      <a href="#support">Поддержка</a>
       <a href="#faq">Вопросы</a>
     </div>
     <a href="https://github.com" target="_blank" rel="noopener" class="nav-dl" style="display:inline-flex; align-items:center; gap:8px;">
@@ -643,6 +673,27 @@
   </div>
 </section>
 
+<section id="support">
+  <div class="section-head">
+    <div class="eyebrow">Поддержка</div>
+    <h2>Что-то не работает? Напиши нам</h2>
+    <p>Опиши проблему — мы увидим сообщение и постараемся ответить или разобраться в ближайшее время.</p>
+  </div>
+  <div class="panel support-wrap">
+    <div id="support-success" class="support-success">Сообщение отправлено! Мы его получили и разберёмся.</div>
+    <div class="support-field">
+      <label for="support-contact">Как с тобой связаться (ник, почта, Discord)</label>
+      <input id="support-contact" type="text" maxlength="80" placeholder="Steve_UA или почта">
+    </div>
+    <div class="support-field">
+      <label for="support-message">Опиши проблему</label>
+      <textarea id="support-message" rows="4" maxlength="800" placeholder="Например: не запускается версия Fabric 1.21.4, вылетает при входе в игру..."></textarea>
+    </div>
+    <div id="support-error" style="display:none; color:#f87171; font-size:0.82rem; margin-bottom:12px;"></div>
+    <button id="support-submit" class="btn-primary" type="button" style="border:none; cursor:pointer;">Отправить</button>
+  </div>
+</section>
+
 <section id="faq">
   <div class="section-head">
     <div class="eyebrow">Вопросы</div>
@@ -683,6 +734,11 @@
     </div>
   </div>
 </footer>
+
+<div class="online-badge" id="online-badge">
+  <span class="online-dot"></span>
+  <span id="online-count">Подключение…</span>
+</div>
 
 <script>
 (function(){
@@ -891,6 +947,77 @@
   });
 
   initReviews();
+
+  /* ---------- Online now (Supabase Realtime Presence) ---------- */
+  function pluralPeople(n){
+    return pluralRu(n, 'человек', 'человека', 'человек');
+  }
+
+  function updateOnlineDisplay(count){
+    var el = document.getElementById('online-count');
+    if (el) el.textContent = count + ' ' + pluralPeople(count) + ' сейчас на сайте';
+  }
+
+  try {
+    var sessionKey = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var presenceChannel = supabaseClient.channel('site-presence', {
+      config: { presence: { key: sessionKey } }
+    });
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, function(){
+        var state = presenceChannel.presenceState();
+        var count = Object.keys(state).length;
+        updateOnlineDisplay(Math.max(count, 1));
+      })
+      .subscribe(async function(status){
+        if (status === 'SUBSCRIBED'){
+          await presenceChannel.track({ online_at: new Date().toISOString() });
+        }
+      });
+  } catch(e){
+    console.error('Presence error:', e);
+    updateOnlineDisplay(1);
+  }
+
+  /* ---------- Support form ---------- */
+  var supportBtn = document.getElementById('support-submit');
+  var supportError = document.getElementById('support-error');
+  var supportSuccess = document.getElementById('support-success');
+
+  if (supportBtn) supportBtn.addEventListener('click', async function(){
+    var contact = document.getElementById('support-contact').value.trim();
+    var message = document.getElementById('support-message').value.trim();
+
+    if (!contact || !message){
+      supportError.textContent = 'Укажи, как с тобой связаться, и опиши проблему.';
+      supportError.style.display = 'block';
+      supportSuccess.style.display = 'none';
+      return;
+    }
+    supportError.style.display = 'none';
+    supportBtn.disabled = true;
+    supportBtn.textContent = 'Отправка…';
+
+    try {
+      var { error } = await supabaseClient.from('support_tickets').insert({
+        contact: contact,
+        message: message
+      });
+      if (error) throw error;
+
+      supportSuccess.style.display = 'block';
+      document.getElementById('support-contact').value = '';
+      document.getElementById('support-message').value = '';
+    } catch(e){
+      console.error('Support ticket error:', e);
+      supportError.textContent = 'Не получилось отправить, попробуй ещё раз.';
+      supportError.style.display = 'block';
+    } finally {
+      supportBtn.disabled = false;
+      supportBtn.textContent = 'Отправить';
+    }
+  });
 })();
 </script>
 
