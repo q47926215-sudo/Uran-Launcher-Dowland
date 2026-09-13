@@ -21,12 +21,17 @@
     --dirt: #78350f;
     --dirt-dark: #451a03;
     --text-main: #e6ebf5;
-    --text-muted: #8b96ad;
+    --text-muted: #a3aec5;
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
 
   html{ scroll-behavior:smooth; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
 
   body{
     background:var(--bg-void);
@@ -38,12 +43,19 @@
 
   a{ color:inherit; }
 
+  :focus-visible{
+    outline:2px solid var(--accent-sky);
+    outline-offset:2px;
+  }
+
   .wrap{
     max-width:1080px;
     margin:0 auto;
     padding:0 24px;
   }
 
+  /* ---------- Notched "voxel panel" — recurring visual device instead of
+     rounded SaaS cards. Pixel-style clipped corners echo block edges. ---------- */
   .panel{
     background:var(--bg-panel);
     border:1px solid var(--border-line);
@@ -51,6 +63,7 @@
     padding:28px;
   }
 
+  /* ---------- Nav ---------- */
   header{
     position:sticky; top:0; z-index:50;
     background:rgba(11,18,32,0.92);
@@ -91,6 +104,7 @@
 
   @media (max-width:720px){ .nav-links{ display:none; } }
 
+  /* ---------- Hero ---------- */
   .hero{
     padding:88px 24px 72px;
     max-width:1080px; margin:0 auto;
@@ -113,9 +127,9 @@
     padding:15px 26px; font-size:0.98rem; font-weight:700;
     background:var(--accent-blue); color:#fff; text-decoration:none;
     clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
-    transition:background .15s, transform .1s;
+    transition:background .15s, transform .1s, box-shadow .15s;
   }
-  .btn-primary:hover{ background:var(--accent-blue-hover); }
+  .btn-primary:hover{ background:var(--accent-blue-hover); box-shadow:0 0 0 3px rgba(56,189,248,0.18); }
   .btn-primary:active{ transform:translateY(1px); }
   .btn-primary small{ display:block; font-weight:500; font-size:0.74rem; opacity:0.85; }
   .btn-ghost{
@@ -126,46 +140,154 @@
   .btn-ghost:hover{ color:var(--text-main); border-color:var(--accent-sky); }
 
   .hero-art{
-    position:relative; height:260px;
+    position:relative; height:320px;
     display:flex; align-items:center; justify-content:center;
   }
-  .voxel{
-    width:150px; height:150px; position:relative;
-  }
-  .voxel .grass{
-    position:absolute; top:0; left:0; right:0; height:80px;
-    background:var(--grass); border:2px solid var(--grass-dark);
-  }
-  .voxel .grass::after{
-    content:''; position:absolute; left:0; right:0; bottom:-6px; height:6px;
-    background:repeating-linear-gradient(90deg, var(--grass-dark) 0 12px, transparent 12px 24px);
-  }
-  .voxel .dirt{
-    position:absolute; top:80px; left:0; right:0; bottom:0;
-    background:var(--dirt); border:2px solid var(--dirt-dark); border-top:none;
-  }
-  .voxel .pixel{ position:absolute; width:14px; height:14px; background:var(--dirt-dark); opacity:0.6; }
 
+  /* ---------- Mini launcher preview card (hero) ---------- */
+  .hero-card{
+    width:100%; max-width:360px; background:#0c1424; border:1px solid var(--border-line);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.55);
+    position:relative; z-index:2;
+  }
+  .hero-card-top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 12px; background:#0f1729; border-bottom:1px solid var(--border-line);
+  }
+  .hero-card-top .t{ display:flex; align-items:center; gap:7px; font-size:0.72rem; color:var(--text-muted); }
+  .hero-card-top .mk{ width:11px; height:11px; position:relative; }
+  .hero-card-top .mk::before{ content:''; position:absolute; top:0;left:0;right:0;height:5px; background:var(--grass); }
+  .hero-card-top .mk::after{ content:''; position:absolute; bottom:0;left:0;right:0;top:5px; background:var(--dirt); }
+  .hero-card-top .wc{ display:flex; gap:9px; color:var(--text-muted); font-size:0.7rem; }
+  .hero-card-body{ padding:18px; }
+  .hero-card-chips{ display:flex; gap:8px; margin-bottom:14px; }
+  .hero-card-chips span{
+    padding:5px 10px; border:1px solid var(--border-line); font-size:0.7rem; color:var(--text-main);
+  }
+  .hero-card-banner{
+    background:var(--accent-blue); padding:10px 12px; font-size:0.76rem; font-weight:700;
+    margin-bottom:14px;
+  }
+  .hero-card-banner span{ display:block; font-weight:500; font-size:0.68rem; opacity:0.85; margin-top:2px; }
+  .hero-card-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .hero-card-select{
+    flex:1; padding:9px 10px; border:1px solid var(--border-line); font-size:0.72rem; color:var(--text-muted);
+    background:var(--bg-panel);
+  }
+  .hero-card-play{
+    padding:10px 18px; background:#f59e0b; color:#241800; font-weight:800; font-size:0.78rem;
+    white-space:nowrap;
+  }
+
+  /* ---------- Isometric grass block (decorative accent) ---------- */
+  .iso-block{
+    position:absolute; width:96px; height:auto;
+    filter:drop-shadow(0 14px 18px rgba(0,0,0,0.45));
+    animation:float 4.5s ease-in-out infinite;
+    z-index:3;
+  }
+  .iso-block.pos-1{ top:-14px; right:-18px; }
+  .iso-block.pos-2{ bottom:-10px; left:-24px; width:56px; animation-delay:-2s; }
+  @keyframes float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-9px); }
+  }
+
+  /* ---------- Launcher mockup (matches real app UI) ---------- */
+  .launcher-mock{
+    background:#0c1424; border:1px solid var(--border-line); overflow:hidden;
+  }
+  .launcher-titlebar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; background:#0f1729; border-bottom:1px solid var(--border-line);
+  }
+  .launcher-titlebar .title{ display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-muted); }
+  .launcher-titlebar .title .mark{ width:14px; height:14px; position:relative; }
+  .launcher-titlebar .title .mark::before{ content:''; position:absolute; top:0;left:0;right:0;height:6px; background:var(--grass); }
+  .launcher-titlebar .title .mark::after{ content:''; position:absolute; bottom:0;left:0;right:0;top:6px; background:var(--dirt); }
+  .win-controls{ display:flex; gap:16px; color:var(--text-muted); font-size:0.9rem; }
+
+  .launcher-body{ display:grid; grid-template-columns:1fr 210px; }
+  @media (max-width:720px){ .launcher-body{ grid-template-columns:1fr; } }
+
+  .launcher-main{ padding:26px; border-right:1px solid var(--border-line); }
+  @media (max-width:720px){ .launcher-main{ border-right:none; border-bottom:1px solid var(--border-line); } }
+  .launcher-brand{ font-size:1.55rem; font-weight:800; letter-spacing:0.01em; margin-bottom:4px; }
+  .launcher-tag{ font-size:0.82rem; color:var(--text-muted); margin-bottom:16px; }
+  .launcher-chips{ display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .launcher-chip{
+    padding:7px 14px; border:1px solid var(--border-line); font-size:0.8rem;
+    display:flex; align-items:center; gap:7px; color:var(--text-main);
+  }
+  .launcher-banner{
+    background:var(--accent-blue); padding:13px 16px; margin-bottom:16px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  }
+  .launcher-banner .srv{ font-size:0.86rem; font-weight:700; }
+  .launcher-banner .srv-status{ font-size:0.76rem; opacity:0.85; margin-top:2px; }
+  .launcher-banner .ip-btn{
+    padding:6px 12px; background:rgba(255,255,255,0.15); font-size:0.78rem; font-weight:600;
+  }
+  .launcher-news{
+    background:var(--bg-panel-alt); border:1px solid var(--border-line); border-left:3px solid var(--accent-sky);
+    padding:16px; margin-bottom:12px;
+  }
+  .launcher-news h4{ color:var(--accent-sky); font-size:0.92rem; margin-bottom:6px; font-weight:700; }
+  .launcher-news p{ font-size:0.82rem; color:var(--text-muted); }
+
+  .launcher-side{ padding:22px 16px; }
+  .launcher-avatar{ width:60px; height:60px; background:var(--accent-blue); margin:0 auto 10px; }
+  .launcher-side .nick{ text-align:center; font-weight:700; font-size:0.94rem; margin-bottom:20px; }
+  .launcher-menu-item{
+    font-size:0.84rem; color:var(--text-muted); padding:10px 4px;
+    border-bottom:1px solid var(--border-line); display:flex; gap:9px; align-items:center;
+  }
+  .launcher-menu-item svg{ width:14px; height:14px; flex-shrink:0; }
+
+  .launcher-bottom{
+    display:flex; align-items:center; gap:12px; padding:16px 20px;
+    border-top:1px solid var(--border-line); background:var(--bg-panel-alt); flex-wrap:wrap;
+  }
+  .launcher-select{
+    padding:9px 14px; border:1px solid var(--border-line); font-size:0.82rem;
+    color:var(--text-main); background:var(--bg-panel); display:flex; align-items:center; gap:8px;
+  }
+  .launcher-play{
+    margin-left:auto; padding:13px 32px; background:#f59e0b; color:#241800;
+    font-weight:800; font-size:0.94rem;
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+  }
+  .launcher-icon-btn{
+    width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border-line); color:var(--text-muted);
+  }
+  .launcher-icon-btn svg{ width:15px; height:15px; }
+
+  /* ---------- Sections shared ---------- */
   section{ padding:64px 24px; }
   .section-head{ max-width:640px; margin-bottom:44px; }
   .section-head .eyebrow{ margin-bottom:10px; }
   h2{ font-size:clamp(1.5rem, 2.6vw, 1.9rem); font-weight:800; margin-bottom:12px; }
   .section-head p{ color:var(--text-muted); }
 
+  /* ---------- Features ---------- */
   .feature-grid{
     max-width:1080px; margin:0 auto;
     display:grid; grid-template-columns:repeat(2, 1fr); gap:16px;
   }
   @media (max-width:720px){ .feature-grid{ grid-template-columns:1fr; } }
-  .feature{ }
-  .feature .tag{
-    display:inline-block; font-size:0.72rem; font-weight:700; letter-spacing:0.03em;
-    color:var(--accent-sky); background:rgba(56,189,248,0.1);
-    padding:4px 10px; margin-bottom:14px;
+  .feature{ transition:border-color .15s, background .15s; }
+  .feature:hover{ border-color:var(--accent-sky); background:var(--bg-panel-alt); }
+  .feature .icon{
+    width:34px; height:34px; margin-bottom:16px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(56,189,248,0.1); color:var(--accent-sky);
   }
+  .feature .icon svg{ width:18px; height:18px; }
   .feature h3{ font-size:1.12rem; margin-bottom:8px; font-weight:700; }
   .feature p{ color:var(--text-muted); font-size:0.94rem; }
 
+  /* ---------- Preview mockup ---------- */
   .preview-wrap{ max-width:1080px; margin:0 auto; }
   .mock{
     background:var(--bg-panel-alt); border:1px solid var(--border-line);
@@ -181,23 +303,51 @@
   .mock-side{ border-right:1px solid var(--border-line); padding:20px 14px; }
   .mock-side .mock-avatar{
     width:44px; height:44px; background:var(--accent-blue); margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.9rem; color:#fff;
   }
-  .mock-line{ height:9px; background:var(--border-line); margin-bottom:10px; }
-  .mock-line.w60{ width:60%; }
-  .mock-line.w80{ width:80%; }
-  .mock-line.w40{ width:40%; }
+  .mock-nick{ font-size:0.86rem; font-weight:600; margin-bottom:2px; }
+  .mock-sub{ font-size:0.76rem; color:var(--text-muted); margin-bottom:20px; }
+  .mock-profile-item{
+    font-size:0.8rem; color:var(--text-muted); padding:7px 0;
+    border-bottom:1px solid var(--border-line);
+  }
+  .mock-profile-item.active{ color:var(--text-main); font-weight:600; }
   .mock-main{ padding:28px; display:flex; flex-direction:column; justify-content:space-between; }
   .mock-version{
     display:inline-block; padding:8px 14px; background:var(--bg-panel);
     border:1px solid var(--border-line); font-size:0.82rem; color:var(--text-muted);
     margin-bottom:10px; width:fit-content;
   }
+  .mock-title{ font-size:1.1rem; font-weight:700; margin-top:16px; }
+  .mock-desc{ font-size:0.86rem; color:var(--text-muted); margin-top:6px; max-width:34ch; }
   .mock-play{
     align-self:flex-start; padding:12px 28px; background:var(--accent-blue);
     color:#fff; font-weight:700; font-size:0.9rem;
     clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));
   }
+  .preview-caption{
+    text-align:center; font-size:0.86rem; color:var(--text-muted); margin-top:14px;
+  }
 
+  /* ---------- Testimonials ---------- */
+  .testi-grid{
+    max-width:1080px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;
+  }
+  @media (max-width:900px){ .testi-grid{ grid-template-columns:1fr; } }
+  .testi{ display:flex; flex-direction:column; justify-content:space-between; min-height:180px; }
+  .testi p{ color:var(--text-main); font-size:0.95rem; margin-bottom:20px; }
+  .testi-author{ display:flex; align-items:center; gap:10px; }
+  .testi-avatar{
+    width:34px; height:34px; background:var(--accent-blue);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.85rem; color:#fff; flex-shrink:0;
+  }
+  .testi-name{ font-size:0.88rem; font-weight:600; }
+  .testi-meta{ font-size:0.78rem; color:var(--text-muted); }
+
+  /* ---------- Download ---------- */
   .download-panel{
     max-width:1080px; margin:0 auto;
     display:grid; grid-template-columns:1fr auto; gap:32px; align-items:center;
@@ -212,6 +362,7 @@
   .meta-row span{ display:flex; align-items:center; gap:7px; }
   .meta-dot{ width:6px; height:6px; background:var(--accent-sky); flex-shrink:0; }
 
+  /* ---------- Steps ---------- */
   .steps{ max-width:1080px; margin:0 auto; }
   .step-list{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
   @media (max-width:720px){ .step-list{ grid-template-columns:1fr; } }
@@ -223,12 +374,14 @@
   .step h3{ font-size:1.02rem; margin-bottom:8px; font-weight:700; }
   .step p{ color:var(--text-muted); font-size:0.92rem; }
 
+  /* ---------- FAQ ---------- */
   .faq{ max-width:720px; margin:0 auto; }
   .faq-item{ border-bottom:1px solid var(--border-line); padding:20px 0; }
   .faq-item:first-child{ border-top:1px solid var(--border-line); }
   .faq-item h3{ font-size:1rem; font-weight:700; margin-bottom:8px; }
   .faq-item p{ color:var(--text-muted); font-size:0.94rem; }
 
+  /* ---------- Footer ---------- */
   footer{
     border-top:1px solid var(--border-line);
     padding:32px 24px 40px;
@@ -239,9 +392,10 @@
     flex-wrap:wrap; gap:20px;
   }
   .footer-note{ font-size:0.82rem; color:var(--text-muted); max-width:52ch; }
-  .footer-links{ display:flex; gap:20px; font-size:0.86rem; }
-  .footer-links a{ text-decoration:none; color:var(--text-muted); }
+  .footer-links{ display:flex; gap:20px; font-size:0.86rem; flex-wrap:wrap; }
+  .footer-links a{ text-decoration:none; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px; }
   .footer-links a:hover{ color:var(--text-main); }
+  .footer-links svg{ width:15px; height:15px; }
 </style>
 </head>
 <body>
@@ -255,9 +409,13 @@
     <div class="nav-links">
       <a href="#features">Особенности</a>
       <a href="#preview">Интерфейс</a>
+      <a href="#reviews">Отзывы</a>
       <a href="#faq">Вопросы</a>
     </div>
-    <a href="#download" class="nav-dl">Скачать</a>
+    <a href="https://github.com" target="_blank" rel="noopener" class="nav-dl" style="display:inline-flex; align-items:center; gap:8px;">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px; height:15px;"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.89-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.9 1.55 2.36 1.11 2.93.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.27 2.75 1.05a9.3 9.3 0 015 0c1.91-1.32 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.79-4.58 5.05.36.32.68.95.68 1.92 0 1.39-.01 2.5-.01 2.85 0 .28.18.6.69.5A10.26 10.26 0 0022 12.25C22 6.58 17.52 2 12 2z"/></svg>
+      GitHub
+    </a>
   </nav>
 </header>
 
@@ -269,20 +427,49 @@
     <h1>Один лаунчер вместо трёх вкладок и папки модов</h1>
     <p>Uran Launcher ставит нужную версию Minecraft, подключает Fabric или Forge и сразу накатывает Sodium с Iris — без ручного поиска джарников по форумам.</p>
     <div class="cta-row">
-      <a href="https://github.com/q47926215-sudo/Uran-Launcher-Dowland/releases/download/v1.0.0/UranLauncherSetup.zip" class="btn-primary">
+      <a href="download/UranLauncherSetup.zip" class="btn-primary">
         Скачать Uran Launcher
         <small>Windows · v1.0 · .zip</small>
       </a>
-      <a href="#faq" class="btn-ghost">Как установить</a>
+      <a href="#faq" class="btn-ghost" style="border:none; padding:14px 4px; text-decoration:underline; text-underline-offset:4px;">Как установить →</a>
     </div>
   </div>
   <div class="hero-art">
-    <div class="voxel">
-      <div class="grass"></div>
-      <div class="dirt"></div>
-      <div class="pixel" style="top:92px; left:20px;"></div>
-      <div class="pixel" style="top:110px; left:90px;"></div>
-      <div class="pixel" style="top:120px; left:50px;"></div>
+    <svg class="iso-block pos-1" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="100,10 178,55 100,100 22,55" fill="var(--grass)"/>
+      <polygon points="22,55 100,100 100,190 22,145" fill="#16803a"/>
+      <polygon points="178,55 100,100 100,190 178,145" fill="#0f5c29"/>
+      <rect x="30" y="150" width="10" height="10" fill="#0a3e1b" opacity="0.7"/>
+      <rect x="55" y="170" width="8" height="8" fill="#0a3e1b" opacity="0.6"/>
+      <rect x="130" y="155" width="9" height="9" fill="#07341a" opacity="0.6"/>
+      <rect x="150" y="175" width="7" height="7" fill="#07341a" opacity="0.6"/>
+      <polygon points="22,55 100,100 100,112 22,67" fill="#3ecf6e" opacity="0.55"/>
+      <polygon points="178,55 100,100 100,112 178,67" fill="#2fae5a" opacity="0.45"/>
+    </svg>
+    <svg class="iso-block pos-2" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="100,10 178,55 100,100 22,55" fill="var(--grass)"/>
+      <polygon points="22,55 100,100 100,190 22,145" fill="#16803a"/>
+      <polygon points="178,55 100,100 100,190 178,145" fill="#0f5c29"/>
+    </svg>
+    <div class="hero-card">
+      <div class="hero-card-top">
+        <div class="t"><span class="mk"></span>Uran Launcher</div>
+        <div class="wc">–&nbsp;&nbsp;▢&nbsp;&nbsp;✕</div>
+      </div>
+      <div class="hero-card-body">
+        <div class="hero-card-chips">
+          <span>📦 Fabric 1.21.4</span>
+          <span>👤 Steve_UA</span>
+        </div>
+        <div class="hero-card-banner">
+          Рекомендуемый сервер: mc.funtime.su
+          <span>🟢 Сервер онлайн</span>
+        </div>
+        <div class="hero-card-row">
+          <div class="hero-card-select">👤 Steve_UA ▾</div>
+          <div class="hero-card-play">▶ Войти</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -295,22 +482,22 @@
   </div>
   <div class="feature-grid">
     <div class="panel feature">
-      <span class="tag">Загрузчики</span>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></div>
       <h3>Fabric и Forge без путаницы версий</h3>
       <p>Выбираешь версию Minecraft и нужный загрузчик — лаунчер сам подтягивает совместимую сборку и ставит поверх ванильного клиента.</p>
     </div>
     <div class="panel feature">
-      <span class="tag">Производительность</span>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
       <h3>Sodium и Iris одной галочкой</h3>
       <p>Оптимизаторы графики и шейдеры ставятся вместе с игрой, а флаги JVM (Aikar's flags) уже настроены под G1GC, чтобы не было фризов на паузах сборщика мусора.</p>
     </div>
     <div class="panel feature">
-      <span class="tag">Профили</span>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M4 10h16M10 4v16"/></svg></div>
       <h3>Свои скины и плащи без сторонних сайтов</h3>
       <p>Локальное хранилище скинов и плащей — по одному файлу на ник, синхронизируется в игру автоматически при запуске.</p>
     </div>
     <div class="panel feature">
-      <span class="tag">Стабильность</span>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v10M12 22a9 9 0 100-18"/><path d="M8 6l-2-2M16 6l2-2"/></svg></div>
       <h3>Понятный экран краша, а не догадки</h3>
       <p>Если игра упала — лаунчер сам находит свежий crash-report или хвост лога и показывает его, с кнопкой скопировать в буфер.</p>
     </div>
@@ -324,31 +511,92 @@
     <p>Всё нужное — на одном экране: аккаунты, версия, ОЗУ и кнопка «Войти в игру».</p>
   </div>
   <div class="preview-wrap">
-    <div class="mock">
-      <div class="mock-top">
-        <div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div>
+    <div class="launcher-mock">
+      <div class="launcher-titlebar">
+        <div class="title"><span class="mark"></span>Uran Launcher — T-Style Edition</div>
+        <div class="win-controls">–&nbsp;&nbsp;▢&nbsp;&nbsp;✕</div>
       </div>
-      <div class="mock-body">
-        <div class="mock-side">
-          <div class="mock-avatar"></div>
-          <div class="mock-line w60"></div>
-          <div class="mock-line w40"></div>
-          <div style="height:24px"></div>
-          <div class="mock-line w80"></div>
-          <div class="mock-line w60"></div>
-          <div class="mock-line w40"></div>
-        </div>
-        <div class="mock-main">
-          <div>
-            <div class="mock-version">📦 Fabric 1.20.1</div>
-            <div class="mock-line w80" style="margin-top:20px;"></div>
-            <div class="mock-line w40"></div>
+      <div class="launcher-body">
+        <div class="launcher-main">
+          <div class="launcher-brand">URAN LAUNCHER</div>
+          <div class="launcher-tag">Vanilla · Fabric · Forge — в одном клиенте</div>
+          <div class="launcher-chips">
+            <div class="launcher-chip">📦 Fabric 1.21.4</div>
+            <div class="launcher-chip">👤 Steve_UA</div>
           </div>
-          <div class="mock-play">▶ Войти в игру</div>
+          <div class="launcher-banner">
+            <div>
+              <div class="srv">Рекомендуемый сервер: mc.funtime.su</div>
+              <div class="srv-status">🟢 Сервер онлайн</div>
+            </div>
+            <div class="ip-btn">📋 IP</div>
+          </div>
+          <div class="launcher-news">
+            <h4>Версия Minecraft 1.21.4 уже доступна!</h4>
+            <p>Официальный релиз свежего обновления с новыми блоками и улучшениями оптимизации.</p>
+          </div>
+          <div class="launcher-news">
+            <h4>Uran Launcher теперь с Fabric и Forge</h4>
+            <p>В выборе версии появились вкладки Vanilla / Fabric / Forge — ставь моды из коробки, без сторонних лаунчеров.</p>
+          </div>
         </div>
+        <div class="launcher-side">
+          <div class="launcher-avatar"></div>
+          <div class="nick">Steve_UA</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 2-2.5 4"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/></svg>Помощь</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/></svg>Установить скин</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.2-1.6l2-1.5-2-3.4-2.4.7a7 7 0 00-1.4-.8L14.5 3h-5l-.5 2.4a7 7 0 00-1.4.8l-2.4-.7-2 3.4 2 1.5A7 7 0 005 12c0 .5.1 1.1.2 1.6l-2 1.5 2 3.4 2.4-.7c.4.3.9.6 1.4.8L9.5 21h5l.5-2.4c.5-.2 1-.5 1.4-.8l2.4.7 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6z"/></svg>Контент (моды/паки)</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M8 21h8M12 18v3"/></svg>Профили (сборки модов)</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>Скриншоты</div>
+          <div class="launcher-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18a14 14 0 010-18"/></svg>Наш сайт</div>
+        </div>
+      </div>
+      <div class="launcher-bottom">
+        <div class="launcher-select">👤 Steve_UA ▾</div>
+        <div class="launcher-select">📦 Fabric 1.21.4</div>
+        <div class="launcher-play">▶ Войти в игру</div>
+        <div class="launcher-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg></div>
+        <div class="launcher-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-11 11"/></svg></div>
+        <div class="launcher-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.2-1.6l2-1.5-2-3.4-2.4.7a7 7 0 00-1.4-.8L14.5 3h-5l-.5 2.4a7 7 0 00-1.4.8l-2.4-.7-2 3.4 2 1.5A7 7 0 005 12c0 .5.1 1.1.2 1.6l-2 1.5 2 3.4 2.4-.7c.4.3.9.6 1.4.8L9.5 21h5l.5-2.4c.5-.2 1-.5 1.4-.8l2.4.7 2-3.4-2-1.5c.1-.5.2-1.1.2-1.6z"/></svg></div>
       </div>
     </div>
+    <p class="preview-caption">Стартовый экран лаунчера — профиль, сервер, новости и запуск на одной панели.</p>
   </div>
+</section>
+
+<section id="reviews">
+  <div class="section-head" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:18px;">
+    <div>
+      <div class="eyebrow">Отзывы</div>
+      <h2>Отзывы <span id="reviews-count">(0)</span></h2>
+      <p>Оцени лаунчер и напиши пару слов — отзыв появится в списке сразу.</p>
+    </div>
+    <button id="open-review-form" class="btn-primary" type="button" style="border:none; cursor:pointer;">Оставить отзыв</button>
+  </div>
+
+  <div id="review-form-wrap" class="panel" style="max-width:520px; margin:0 auto 32px; display:none;">
+    <div style="margin-bottom:14px;">
+      <label style="display:block; font-size:0.86rem; color:var(--text-muted); margin-bottom:6px;">Имя или ник</label>
+      <input id="review-name" type="text" maxlength="40" placeholder="Steve_UA"
+        style="width:100%; padding:10px 12px; background:var(--bg-panel-alt); border:1px solid var(--border-line); color:var(--text-main); font-family:inherit; font-size:0.92rem;">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block; font-size:0.86rem; color:var(--text-muted); margin-bottom:6px;">Оценка</label>
+      <div id="star-picker" style="display:flex; gap:6px;"></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="display:block; font-size:0.86rem; color:var(--text-muted); margin-bottom:6px;">Отзыв</label>
+      <textarea id="review-text" rows="3" maxlength="400" placeholder="Как всё прошло?"
+        style="width:100%; padding:10px 12px; background:var(--bg-panel-alt); border:1px solid var(--border-line); color:var(--text-main); font-family:inherit; font-size:0.92rem; resize:vertical;"></textarea>
+    </div>
+    <div id="review-error" style="display:none; color:#f87171; font-size:0.82rem; margin-bottom:12px;"></div>
+    <div style="display:flex; gap:10px;">
+      <button id="submit-review" class="btn-primary" type="button" style="border:none; cursor:pointer;">Опубликовать</button>
+      <button id="cancel-review" class="btn-ghost" type="button" style="background:none; cursor:pointer;">Отмена</button>
+    </div>
+  </div>
+
+  <div id="reviews-list" class="testi-grid"></div>
 </section>
 
 <section id="download">
@@ -362,12 +610,13 @@
         <span><span class="meta-dot"></span>Java устанавливается автоматически</span>
       </div>
     </div>
-    <a href="https://github.com/q47926215-sudo/Uran-Launcher-Dowland/releases/download/v1.0.0/UranLauncherSetup.zip" class="btn-primary">
+    <a href="download/UranLauncherSetup.zip" id="download-btn" class="btn-primary">
       Скачать .zip
       <small>UranLauncherSetup.zip</small>
     </a>
   </div>
 </section>
+<p class="download-count-display" style="text-align:center; font-size:0.84rem; color:var(--text-muted); max-width:1080px; margin:14px auto 0;">Загрузка данных…</p>
 
 <section class="steps" id="how-to">
   <div class="section-head">
@@ -400,8 +649,8 @@
   </div>
   <div class="faq">
     <div class="faq-item">
-      <h3>Это безопасно?</h3>
-      <p>Установщик не запрашивает лишних прав и не устанавливает ничего, кроме самого лаунчера. Если антивирус или SmartScreen предупреждают о неизвестном разработчике — это нормально для несертифицированных .exe, файл всё равно можно запустить через «Подробнее → Выполнить в любом случае».</p>
+      <h3>Почему Windows показывает предупреждение при установке?</h3>
+      <p>Установщик пока не подписан сертификатом — из-за этого SmartScreen может показать предупреждение о неизвестном издателе. Это ожидаемо для новых independent-программ и мы работаем над получением сертификата. Если вы не уверены в источнике файла, не запускайте его.</p>
     </div>
     <div class="faq-item">
       <h3>Нужно ли ставить Java отдельно?</h3>
@@ -409,7 +658,7 @@
     </div>
     <div class="faq-item">
       <h3>Работает ли с лицензионным аккаунтом Microsoft?</h3>
-      <p>Текущая версия рассчитана на офлайн-профили (ник без пароля). Поддержка входа через Microsoft — в планах на следующую версию.</p>
+      <p>Текущая версия рассчитана на офлайн-профили (локальный ник без входа в аккаунт). Поддержка входа через лицензионный аккаунт Microsoft — в планах на следующую версию.</p>
     </div>
     <div class="faq-item">
       <h3>Можно ли перенести моды из другого лаунчера?</h3>
@@ -426,9 +675,215 @@
     <div class="footer-links">
       <a href="#download">Скачать</a>
       <a href="#faq">Вопросы</a>
+      <a href="https://github.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.89-2.78.62-3.37-1.21-3.37-1.21-.46-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.9 1.55 2.36 1.11 2.93.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.27 2.75 1.05a9.3 9.3 0 015 0c1.91-1.32 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.79-4.58 5.05.36.32.68.95.68 1.92 0 1.39-.01 2.5-.01 2.85 0 .28.18.6.69.5A10.26 10.26 0 0022 12.25C22 6.58 17.52 2 12 2z"/></svg>
+        GitHub
+      </a>
     </div>
   </div>
 </footer>
+
+<script>
+(function(){
+  var selectedRating = 0;
+
+  function pluralRu(n, one, few, many){
+    n = Math.abs(n) % 100;
+    var n1 = n % 10;
+    if (n > 10 && n < 20) return many;
+    if (n1 === 1) return one;
+    if (n1 > 1 && n1 < 5) return few;
+    return many;
+  }
+
+  function escapeHtml(str){
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function renderStars(rating){
+    var out = '';
+    for (var i = 1; i <= 5; i++){
+      out += i <= rating ? '★' : '☆';
+    }
+    return out;
+  }
+
+  function formatDate(ts){
+    try {
+      return new Date(ts).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+    } catch(e){ return ''; }
+  }
+
+  /* ---------- Download counter ---------- */
+  async function initDownloadCounter(){
+    var display = document.querySelector('.download-count-display');
+    try {
+      var res = await window.storage.get('download-count', true);
+      var count = res ? parseInt(res.value, 10) || 0 : 0;
+      display.textContent = 'Скачано ' + count + ' ' + pluralRu(count, 'раз', 'раза', 'раз');
+    } catch(e){
+      display.textContent = 'Скачано 0 раз';
+    }
+  }
+
+  async function handleDownloadClick(){
+    try {
+      var already = null;
+      try { already = await window.storage.get('has-downloaded', false); } catch(e){ already = null; }
+      if (already && already.value === 'true') return;
+
+      var res = await window.storage.get('download-count', true).catch(function(){ return null; });
+      var current = res ? parseInt(res.value, 10) || 0 : 0;
+      var next = current + 1;
+      await window.storage.set('download-count', String(next), true);
+      await window.storage.set('has-downloaded', 'true', false);
+
+      var display = document.querySelector('.download-count-display');
+      display.textContent = 'Скачано ' + next + ' ' + pluralRu(next, 'раз', 'раза', 'раз');
+    } catch(e){
+      console.error('Download counter error:', e);
+    }
+  }
+
+  var dlBtn = document.getElementById('download-btn');
+  if (dlBtn) dlBtn.addEventListener('click', handleDownloadClick);
+  initDownloadCounter();
+
+  /* ---------- Reviews ---------- */
+  async function loadReviews(){
+    try {
+      var res = await window.storage.get('reviews-list', true);
+      return res ? JSON.parse(res.value) : [];
+    } catch(e){
+      return [];
+    }
+  }
+
+  function renderReviews(list){
+    var countEl = document.getElementById('reviews-count');
+    var listEl = document.getElementById('reviews-list');
+    countEl.textContent = '(' + list.length + ')';
+    listEl.innerHTML = '';
+
+    if (list.length === 0){
+      var empty = document.createElement('p');
+      empty.style.color = 'var(--text-muted)';
+      empty.style.fontSize = '0.94rem';
+      empty.textContent = 'Пока нет отзывов — будь первым, кто оценит лаунчер.';
+      listEl.appendChild(empty);
+      return;
+    }
+
+    list.forEach(function(r){
+      var card = document.createElement('div');
+      card.className = 'panel testi';
+      card.innerHTML =
+        '<div>' +
+          '<div style="color:var(--accent-sky); letter-spacing:2px; margin-bottom:10px;">' + renderStars(r.rating) + '</div>' +
+          '<p>' + escapeHtml(r.text) + '</p>' +
+        '</div>' +
+        '<div class="testi-author">' +
+          '<div class="testi-avatar">' + escapeHtml((r.name || '?').charAt(0).toUpperCase()) + '</div>' +
+          '<div>' +
+            '<div class="testi-name">' + escapeHtml(r.name) + '</div>' +
+            '<div class="testi-meta">' + formatDate(r.ts) + '</div>' +
+          '</div>' +
+        '</div>';
+      listEl.appendChild(card);
+    });
+  }
+
+  async function initReviews(){
+    var list = await loadReviews();
+    renderReviews(list);
+  }
+
+  function buildStarPicker(){
+    var picker = document.getElementById('star-picker');
+    picker.innerHTML = '';
+    for (var i = 1; i <= 5; i++){
+      (function(val){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '☆';
+        btn.style.cssText = 'font-size:1.5rem; background:none; border:none; cursor:pointer; color:var(--text-muted); line-height:1; padding:2px;';
+        btn.addEventListener('click', function(){
+          selectedRating = val;
+          updateStarPicker();
+        });
+        picker.appendChild(btn);
+      })(i);
+    }
+  }
+
+  function updateStarPicker(){
+    var buttons = document.querySelectorAll('#star-picker button');
+    buttons.forEach(function(btn, idx){
+      var filled = (idx + 1) <= selectedRating;
+      btn.textContent = filled ? '★' : '☆';
+      btn.style.color = filled ? 'var(--accent-sky)' : 'var(--text-muted)';
+    });
+  }
+
+  var openBtn = document.getElementById('open-review-form');
+  var formWrap = document.getElementById('review-form-wrap');
+  var cancelBtn = document.getElementById('cancel-review');
+  var submitBtn = document.getElementById('submit-review');
+  var errorEl = document.getElementById('review-error');
+
+  buildStarPicker();
+
+  if (openBtn) openBtn.addEventListener('click', function(){
+    formWrap.style.display = formWrap.style.display === 'none' ? 'block' : 'none';
+  });
+  if (cancelBtn) cancelBtn.addEventListener('click', function(){
+    formWrap.style.display = 'none';
+    errorEl.style.display = 'none';
+  });
+
+  if (submitBtn) submitBtn.addEventListener('click', async function(){
+    var name = document.getElementById('review-name').value.trim();
+    var text = document.getElementById('review-text').value.trim();
+
+    if (!name || !text || selectedRating === 0){
+      errorEl.textContent = 'Заполни имя, отзыв и поставь оценку.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    errorEl.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Публикация…';
+
+    try {
+      var list = await loadReviews();
+      list.unshift({
+        name: name,
+        rating: selectedRating,
+        text: text,
+        ts: Date.now()
+      });
+      await window.storage.set('reviews-list', JSON.stringify(list), true);
+      renderReviews(list);
+
+      document.getElementById('review-name').value = '';
+      document.getElementById('review-text').value = '';
+      selectedRating = 0;
+      updateStarPicker();
+      formWrap.style.display = 'none';
+    } catch(e){
+      errorEl.textContent = 'Не получилось сохранить отзыв, попробуй ещё раз.';
+      errorEl.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Опубликовать';
+    }
+  });
+
+  initReviews();
+})();
+</script>
 
 </body>
 </html>
