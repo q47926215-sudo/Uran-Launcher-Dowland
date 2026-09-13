@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg-void: #0b1220;
@@ -685,6 +686,10 @@
 
 <script>
 (function(){
+  var SUPABASE_URL = 'https://ivkokkveagsxxnxsnvsa.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_QQzy3bMDWByUwoNQ_IAA9A_QyjeohSd';
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   var selectedRating = 0;
 
   function pluralRu(n, one, few, many){
@@ -716,32 +721,30 @@
     } catch(e){ return ''; }
   }
 
-  /* ---------- Download counter ---------- */
+  /* ---------- Download counter (Supabase) ---------- */
   async function initDownloadCounter(){
     var display = document.querySelector('.download-count-display');
     try {
-      var res = await window.storage.get('download-count', true);
-      var count = res ? parseInt(res.value, 10) || 0 : 0;
+      var { data, error } = await supabaseClient.from('stats').select('value').eq('key', 'downloads').single();
+      if (error) throw error;
+      var count = data ? data.value : 0;
       display.textContent = 'Скачано ' + count + ' ' + pluralRu(count, 'раз', 'раза', 'раз');
     } catch(e){
+      console.error('Download counter load error:', e);
       display.textContent = 'Скачано 0 раз';
     }
   }
 
   async function handleDownloadClick(){
     try {
-      var already = null;
-      try { already = await window.storage.get('has-downloaded', false); } catch(e){ already = null; }
-      if (already && already.value === 'true') return;
+      if (localStorage.getItem('uran_has_downloaded') === 'true') return;
 
-      var res = await window.storage.get('download-count', true).catch(function(){ return null; });
-      var current = res ? parseInt(res.value, 10) || 0 : 0;
-      var next = current + 1;
-      await window.storage.set('download-count', String(next), true);
-      await window.storage.set('has-downloaded', 'true', false);
+      var { data, error } = await supabaseClient.rpc('increment_downloads');
+      if (error) throw error;
 
+      localStorage.setItem('uran_has_downloaded', 'true');
       var display = document.querySelector('.download-count-display');
-      display.textContent = 'Скачано ' + next + ' ' + pluralRu(next, 'раз', 'раза', 'раз');
+      display.textContent = 'Скачано ' + data + ' ' + pluralRu(data, 'раз', 'раза', 'раз');
     } catch(e){
       console.error('Download counter error:', e);
     }
@@ -751,12 +754,17 @@
   if (dlBtn) dlBtn.addEventListener('click', handleDownloadClick);
   initDownloadCounter();
 
-  /* ---------- Reviews ---------- */
+  /* ---------- Reviews (Supabase) ---------- */
   async function loadReviews(){
     try {
-      var res = await window.storage.get('reviews-list', true);
-      return res ? JSON.parse(res.value) : [];
+      var { data, error } = await supabaseClient
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
     } catch(e){
+      console.error('Reviews load error:', e);
       return [];
     }
   }
@@ -788,7 +796,7 @@
           '<div class="testi-avatar">' + escapeHtml((r.name || '?').charAt(0).toUpperCase()) + '</div>' +
           '<div>' +
             '<div class="testi-name">' + escapeHtml(r.name) + '</div>' +
-            '<div class="testi-meta">' + formatDate(r.ts) + '</div>' +
+            '<div class="testi-meta">' + formatDate(r.created_at) + '</div>' +
           '</div>' +
         '</div>';
       listEl.appendChild(card);
@@ -857,14 +865,14 @@
     submitBtn.textContent = 'Публикация…';
 
     try {
-      var list = await loadReviews();
-      list.unshift({
+      var { error } = await supabaseClient.from('reviews').insert({
         name: name,
         rating: selectedRating,
-        text: text,
-        ts: Date.now()
+        text: text
       });
-      await window.storage.set('reviews-list', JSON.stringify(list), true);
+      if (error) throw error;
+
+      var list = await loadReviews();
       renderReviews(list);
 
       document.getElementById('review-name').value = '';
@@ -873,6 +881,7 @@
       updateStarPicker();
       formWrap.style.display = 'none';
     } catch(e){
+      console.error('Review submit error:', e);
       errorEl.textContent = 'Не получилось сохранить отзыв, попробуй ещё раз.';
       errorEl.style.display = 'block';
     } finally {
